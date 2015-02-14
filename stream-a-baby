@@ -17,14 +17,10 @@ rpicamsrc bitrate=$bitrate preview=0 \
 ! video/x-h264,width=$width,height=$height,framerate=$framerate/1,profile=high \
 ! h264parse \
 ! flvmux \
-! rtmpsink location="$output live=1"
+! rtmpsink location="$output live=1" &
 
 child="$!"
 
-cleanup() {
-	kill $child
-}
-
-trap "cleanup" exit INT TERM
+trap "kill $child" exit INT TERM
 
 wait
