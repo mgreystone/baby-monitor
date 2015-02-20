@@ -1,0 +1,42 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          look-a-baby
+# Required-Start:    $local_fs $network
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: look-a-baby
+# Description:       Looks at a baby
+### END INIT INFO
+
+if test -f /etc/default/look-a-baby; then
+	. /etc/default/look-a-baby
+fi
+
+PID_FILE=/var/run/look-a-baby.pid
+
+case "$1" in
+	start)
+		echo "Starting look-a-baby"
+		start-stop-daemon \
+			--start \
+			--background \
+			--make-pidfile \
+			--pidfile $PID_FILE \
+			--exec /usr/local/bin/look-a-baby \
+			-- \
+				-r $URL \
+	;;
+
+	stop)
+		echo "Stopping look-a-baby"
+		start-stop-daemon --stop --pidfile $PID_FILE --retry TERM/5/KILL/1
+	;;
+	
+	*)
+		echo "Usage: /etc/init.d/look-a-baby {start|stop}"
+		exit 1
+	;; 
+
+esac
