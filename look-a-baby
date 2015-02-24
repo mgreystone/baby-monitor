@@ -8,16 +8,23 @@ while getopts ":r:" opt; do
 	esac
 done
 
+out=/dev/fb1
+
 gst-launch-1.0 \
 rtmpsrc location="$url live=1" \
 ! flvdemux \
 ! h264parse \
 ! omxh264dec \
 ! videoconvert \
-! fbdevsink device=/dev/fb1 sync=false &
+! fbdevsink device=$out sync=false &
 
 child="$!"
 
-trap "kill $child" exit INT TERM
+cleanup() {
+	kill $child
+	dd if=/dev/zero of=$out
+}
+
+trap cleanup exit INT TERM
 
 wait
