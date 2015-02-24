@@ -13,8 +13,10 @@ while getopts ":o:w:h:f:b:" opt; do
 done
 
 gst-launch-1.0 \
-rpicamsrc bitrate=$bitrate preview=0 \
-! video/x-h264,width=$width,height=$height,framerate=$framerate/1,profile=high \
+v4l2src \
+! video/x-raw,width=$width,height=$height,framerate=$framerate/1 \
+! omxh264enc target-bitrate=$bitrate control-rate=variable \
+! video/x-h264,profile=high \
 ! h264parse \
 ! flvmux \
 ! rtmpsink location="$output live=1" &
