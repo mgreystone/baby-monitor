@@ -16,7 +16,7 @@ rtmpsrc location="$url live=1" \
 ! h264parse \
 ! omxh264dec \
 ! videoconvert \
-! fbdevsink device=$out sync=false &
+! fbdevsink device=$out &
 
 child="$!"
 
