@@ -1,0 +1,49 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          stream-a-baby
+# Required-Start:    $local_fs $network $nginx
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: stream-a-baby
+# Description:       Streams a baby to you
+### END INIT INFO
+
+if test -f /etc/default/stream-a-baby; then
+    . /etc/default/stream-a-baby
+fi
+
+PID_FILE=/var/run/stream-a-baby.pid
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting stream-a-baby "
+    start-stop-daemon \
+                --start \
+                --background \
+                --make-pidfile \
+                --pidfile $PID_FILE \
+                --exec /usr/local/bin/stream-a-baby \
+                -- \
+                        -w $WIDTH \
+                        -h $HEIGHT \
+                        -f $FRAMERATE \
+                        -b $BITRATE \
+                        -o $STREAM_URL
+ 
+    ;;
+  stop)
+    echo "Stopping stream-a-baby"
+    
+    # example 1
+    start-stop-daemon --stop --pidfile $PID_FILE --retry TERM/5/KILL/1
+    ;;
+  *)
+    echo "Usage: /etc/init.d/stream-a-baby {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

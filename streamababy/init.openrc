@@ -1,0 +1,36 @@
+#!/sbin/runscript
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $NAME=stream-a-baby
+
+PID_FILE=/var/run/stream-a-baby.pid
+
+depend() {
+	need net nginx
+}
+
+start() {
+	ebegin "Starting ${NAME}"
+
+	start-stop-daemon \
+		--start \
+		--background \
+		--make-pidfile \
+		--pidfile ${PID_FILE} \
+		--exec /usr/local/bin/stream-a-baby \
+		-- \
+			-w ${WIDTH} \
+			-h ${HEIGHT} \
+			-f ${FRAMERATE} \
+			-b ${BITRATE} \
+			-o ${STREAM_URL}
+
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping ${NAME}"
+	start-stop-daemon --stop --pidfile ${PID_FILE} --retry TERM/5/KILL/1
+	eend $?
+}
+

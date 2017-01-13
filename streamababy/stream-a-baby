@@ -1,0 +1,28 @@
+#!/bin/sh
+
+while getopts ":o:w:h:f:b:" opt; do
+        case $opt in
+                o) output=$OPTARG;;
+                w) width=$OPTARG;;
+                h) height=$OPTARG;;
+                f) framerate=$OPTARG;;
+                b) bitrate=$OPTARG;;
+                :) echo "Missing option argument for -$OPTARG" >&2; exit 1;;
+                *) echo "Unkown option: -$OPTARG" >&2; exit 1;;
+        esac
+done
+
+gst-launch-1.0 \
+v4l2src \
+! video/x-raw,width=$width,height=$height,framerate=$framerate/1 \
+! omxh264enc target-bitrate=$bitrate control-rate=variable \
+! video/x-h264,profile=high \
+! h264parse \
+! flvmux \
+! rtmpsink location="$output live=1" &
+
+child="$!"
+
+trap "kill $child" exit INT TERM
+
+wait

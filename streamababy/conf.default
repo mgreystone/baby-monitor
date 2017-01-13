@@ -1,0 +1,7 @@
+NAME="Stream-a-Baby"
+WIDTH=380
+HEIGHT=240
+FRAMERATE=15
+BITRATE=1000000
+STREAM_URL="rtmp://localhost/live/baby.flv"
+
