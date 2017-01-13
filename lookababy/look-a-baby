@@ -1,0 +1,30 @@
+#!/bin/sh
+
+while getopts ":r:" opt; do
+	case $opt in
+		r) url=$OPTARG;;
+		:) echo "Missing option argument for -$OPTARG >&2; exit 1;;
+		*) echo "Unknown option: -$OPTARG >&2; exit 1;;
+	esac
+done
+
+out=/dev/fb1
+
+gst-launch-1.0 \
+rtmpsrc location="$url live=1" \
+! flvdemux \
+! h264parse \
+! omxh264dec \
+! videoconvert \
+! fbdevsink device=$out &
+
+child="$!"
+
+cleanup() {
+	kill $child
+	dd if=/dev/zero of=$out
+}
+
+trap cleanup exit INT TERM
+
+wait
